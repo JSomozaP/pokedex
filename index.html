@@ -5,26 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pokedex</title>
     <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div id="pkmn-container">
-        <header>
-            <div id="header">
-            <h1>Pokedex</h1>
+    <header class="pokemon-header">
+        <h1>Pokedex</h1>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Rechercher un Pokemon...">
         </div>
     </header>
-    <main>
-        <section id="add-task">
-            <div class="task-header">
-        
-                <div class="search-container">
-                    <span class="search-icon">🔍</span>
-                    <input type="text" id="search-input" class="hidden" placeholder="Rechercher un Pokemon...">
-                </div>
+
+    <main class="pokemon-content">
+        <div class="pokemon-list">
+            <select id="pokemon-select">
+                <option value="">Sélectionnez un Pokemon</option>
+            </select>
+            <div class="pokemon-list-custom">
+                <!-- La liste personnalisée sera générée ici par JavaScript -->
             </div>
-    
-        </section>
-        
+        </div>
+        <div class="pokemon-display">
+            <!-- Les détails du Pokemon seront ajoutés ici par JavaScript -->
+        </div>
     </main>
     
     <script src="main.js"></script>

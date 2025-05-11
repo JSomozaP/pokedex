@@ -67,7 +67,6 @@ async function displayPokemonDetails(id, name) {
     try {
         console.log(`Loading details for Pokemon #${id} (${name})`);
 
-        // Récupérer les données Pokebuild pour l'affichage HD
         const pokebuildResponse = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/${id}`);
         if (!pokebuildResponse.ok) {
             throw new Error(`HTTP error! status: ${pokebuildResponse.status}`);
@@ -90,19 +89,22 @@ async function displayPokemonDetails(id, name) {
 
         html += '<div class="evolution-section">';
         
-        // Vérifier et afficher la pré-évolution si elle existe
-        if (pokebuildData.apiPreEvolution && pokebuildData.apiPreEvolution.pokedexId) {
-            html += `
-                <h3>Évolue de :</h3>
-                <div class="evolution-grid">
-                    <div class="evolution-card">
-                        <span class="number">${pokebuildData.apiPreEvolution.pokedexId}</span>
-                        <img src="${pokebuildData.apiPreEvolution.image}" alt="${pokebuildData.apiPreEvolution.name}">
-                        <span class="name">${pokebuildData.apiPreEvolution.name}</span>
-                    </div>
-                </div>
-            `;
-        }
+// Vérifier et afficher la pré-évolution si elle existe
+if (pokebuildData.apiPreEvolution && pokebuildData.apiPreEvolution.name) {
+    console.log('Pre-evolution data:', pokebuildData.apiPreEvolution);
+    
+    const preEvoId = pokebuildData.apiPreEvolution.pokedexIdd; // Notez le double 'd'
+    html += `
+        <h3>Évolue de :</h3>
+        <div class="evolution-grid">
+            <div class="evolution-card">
+                <span class="number">#${preEvoId}</span>
+                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${preEvoId}.png" alt="${pokebuildData.apiPreEvolution.name}">
+                <span class="name">${pokebuildData.apiPreEvolution.name}</span>
+            </div>
+        </div>
+    `;
+}
         
         // Vérifier et afficher les évolutions si elles existent
         if (pokebuildData.apiEvolutions && pokebuildData.apiEvolutions.length > 0) {
@@ -111,8 +113,8 @@ async function displayPokemonDetails(id, name) {
                 <div class="evolution-grid">
                     ${pokebuildData.apiEvolutions.map(evolution => `
                         <div class="evolution-card">
-                            <span class="number">${evolution.pokedexId}</span>
-                            <img src="${evolution.image}" alt="${evolution.name}">
+                            <span class="number">#${evolution.pokedexId}</span>
+                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evolution.pokedexId}.png" alt="${evolution.name}">
                             <span class="name">${evolution.name}</span>
                         </div>
                     `).join('')}

@@ -26,20 +26,16 @@ async function loadTypeIcons() {
 // Charger les 151 premiers Pokémon
 async function loadPokemons() {
     try {
-        // Charger les données depuis Pokebuild pour avoir les noms en français
         const pokebuildResponse = await fetch('https://pokebuildapi.fr/api/v1/pokemon');
         const pokebuildData = await pokebuildResponse.json();
         const firstGenPokemon = pokebuildData.filter(p => p.id <= 151);
         
-        // Vider la liste personnalisée
         pokemonListCustom.innerHTML = '';
         
-        // Créer les options avec les noms en français
         firstGenPokemon.forEach((pokemon) => {
             const pokemonOption = document.createElement('div');
             pokemonOption.className = 'pokemon-option';
             
-            // Récupérer le sprite depuis PokeAPI directement
             const spriteUrl = `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${pokemon.id}.png`;
             
             pokemonOption.innerHTML = `
@@ -67,11 +63,28 @@ async function displayPokemonDetails(id, name) {
     try {
         console.log(`Loading details for Pokemon #${id} (${name})`);
 
+        // Charger les données du Pokémon actuel
         const pokebuildResponse = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/${id}`);
         if (!pokebuildResponse.ok) {
             throw new Error(`HTTP error! status: ${pokebuildResponse.status}`);
         }
         const pokebuildData = await pokebuildResponse.json();
+        
+        // Si le Pokémon a une pré-évolution hors 1ère gen, charger ses données
+        if (pokebuildData.apiPreEvolution && pokebuildData.apiPreEvolution.name) {
+            const preEvoId = pokebuildData.apiPreEvolution.pokedexIdd;
+            // Charger les détails de la pré-évolution même si elle est hors 1ère gen
+            const preEvoResponse = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/${preEvoId}`);
+            if (preEvoResponse.ok) {
+                const preEvoData = await preEvoResponse.json();
+                // Mettre à jour les données de pré-évolution
+                pokebuildData.apiPreEvolution = {
+                    ...pokebuildData.apiPreEvolution,
+                    image: preEvoData.image,
+                    pokedexIdd: preEvoData.id
+                };
+            }
+        }
         
         let html = `
             <div class="number">n°${pokebuildData.id}</div>
@@ -89,38 +102,49 @@ async function displayPokemonDetails(id, name) {
 
         html += '<div class="evolution-section">';
         
-// Vérifier et afficher la pré-évolution si elle existe
-if (pokebuildData.apiPreEvolution && pokebuildData.apiPreEvolution.name) {
-    console.log('Pre-evolution data:', pokebuildData.apiPreEvolution);
-    
-    const preEvoId = pokebuildData.apiPreEvolution.pokedexIdd; // Notez le double 'd'
-    html += `
-        <h3>Évolue de :</h3>
-        <div class="evolution-grid">
-            <div class="evolution-card">
-                <span class="number">#${preEvoId}</span>
-                <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${preEvoId}.png" alt="${pokebuildData.apiPreEvolution.name}">
-                <span class="name">${pokebuildData.apiPreEvolution.name}</span>
-            </div>
-        </div>
-    `;
-}
-        
-        // Vérifier et afficher les évolutions si elles existent
-        if (pokebuildData.apiEvolutions && pokebuildData.apiEvolutions.length > 0) {
+        // Vérifier et afficher la pré-évolution si elle existe
+        if (pokebuildData.apiPreEvolution && pokebuildData.apiPreEvolution.name) {
+            const preEvoId = pokebuildData.apiPreEvolution.pokedexIdd;
             html += `
-                <h3>Évolue en :</h3>
+                <h3>Évolue de :</h3>
                 <div class="evolution-grid">
-                    ${pokebuildData.apiEvolutions.map(evolution => `
-                        <div class="evolution-card">
-                            <span class="number">#${evolution.pokedexId}</span>
-                            <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${evolution.pokedexId}.png" alt="${evolution.name}">
-                            <span class="name">${evolution.name}</span>
-                        </div>
-                    `).join('')}
+                    <div class="evolution-card" onclick="displayPokemonDetails(${preEvoId}, '${pokebuildData.apiPreEvolution.name}')">
+                        <span class="number">#${preEvoId}</span>
+                        <img src="${pokebuildData.apiPreEvolution.image || `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${preEvoId}.png`}" alt="${pokebuildData.apiPreEvolution.name}">
+                        <span class="name">${pokebuildData.apiPreEvolution.name}</span>
+                    </div>
                 </div>
             `;
         }
+        
+// Vérifier et afficher les évolutions si elles existent
+if (pokebuildData.apiEvolutions && pokebuildData.apiEvolutions.length > 0) {
+    // Charger les données des évolutions pour obtenir les images HD
+    const evolutionsPromises = pokebuildData.apiEvolutions.map(async evolution => {
+        const response = await fetch(`https://pokebuildapi.fr/api/v1/pokemon/${evolution.pokedexId}`);
+        const data = await response.json();
+        return {
+            ...evolution,
+            image: data.image
+        };
+    });
+
+    // Attendre que toutes les évolutions soient chargées
+    const evolutionsWithImages = await Promise.all(evolutionsPromises);
+
+    html += `
+        <h3>Évolue en :</h3>
+        <div class="evolution-grid">
+            ${evolutionsWithImages.map(evolution => `
+                <div class="evolution-card" onclick="displayPokemonDetails(${evolution.pokedexId}, '${evolution.name}')">
+                    <span class="number">#${evolution.pokedexId}</span>
+                    <img src="${evolution.image}" alt="${evolution.name}">
+                    <span class="name">${evolution.name}</span>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
 
         html += '</div>';
         pokemonDisplay.innerHTML = html;

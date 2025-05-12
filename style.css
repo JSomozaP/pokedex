@@ -235,10 +235,13 @@ body {
     flex-direction: column;
     align-items: center;
     transition: background-color 0.2s;
+    cursor : pointer;
+    transition: transform 0.2s;
 }
 
 .evolution-card:hover {
     background: #3A3A3A;
+    transform: scale(1.05);
 }
 
 .evolution-card .number {
@@ -278,4 +281,106 @@ body {
 
 #search-input::placeholder {
     color: rgba(255, 255, 255, 0.7);
+}
+
+/* Modifications pour le responsive */
+@media screen and (max-width: 768px) {
+    .pokemon-content {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .pokemon-list {
+        width: 100%;
+        position: relative;
+        top: 0;
+    }
+
+    .pokemon-display {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .pokemon-display img {
+        width: 200px;
+        height: 200px;
+    }
+
+    .pokemon-display h2 {
+        font-size: 1.8em;
+    }
+
+    .pokemon-header h1 {
+        font-size: 2em;
+    }
+
+    .search-container {
+        width: 100%;
+        padding: 0 20px;
+    }
+
+    #search-input {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    .evolution-grid {
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 5px;
+    }
+
+    .evolution-card {
+        padding: 5px;
+    }
+
+    .evolution-card img {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* Pour les très petits écrans */
+@media screen and (max-width: 480px) {
+    .pokemon-header h1 {
+        font-size: 1.5em;
+    }
+
+    .pokemon-display img {
+        width: 150px;
+        height: 150px;
+    }
+
+    .pokemon-display h2 {
+        font-size: 1.4em;
+    }
+
+    .type {
+        font-size: 0.7em;
+        padding: 3px 6px;
+    }
+
+    .evolution-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .evolution-card {
+        min-width: 80px;
+    }
+
+    .evolution-card img {
+        width: 50px;
+        height: 50px;
+    }
+
+    .evolution-card .name {
+        font-size: 0.7em;
+    }
+}
+
+/* Pour gérer la hauteur sur les petits écrans */
+@media screen and (max-height: 700px) {
+    .pokemon-list-custom {
+        max-height: 200px;
+    }
 }

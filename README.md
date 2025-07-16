@@ -30,6 +30,15 @@ Un Pokédex interactif moderne permettant d'explorer les 151 premiers Pokémon a
 ### Toutes les évolutions d'Évoli
 ![Évolutions d'Évoli](screenshots/pokedex%20inclusion%20de%20toute%20les%20evolutions%20evoli.png)
 
+### Version responsive
+![Responsive](screenshots/pokedex%20responsive.png)
+
+### Responsive - Évolutions d'Évoli
+![Responsive Évoli](screenshots/pokedex%20responsive%20evoli.png)
+
+### Wireframe de l'interface
+![Wireframe](screenshots/pokedex%20wireframe%20interface.png)
+
 ## 🚀 Installation et utilisation
 
 ### Prérequis
